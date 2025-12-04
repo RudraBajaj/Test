@@ -1,0 +1,11 @@
+version: '3.8'
+
+services:
+  discord-bot:
+    # Build the image from the current directory
+    build: .
+    # Load environment variables from the .env file
+    env_file:
+      - .env
+    # Restart the bot automatically if it crashes
+    restart: always
