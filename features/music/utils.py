@@ -4,9 +4,9 @@ import yt_dlp
 import os
 
 
-# yt-dlp options - Download to /tmp with optimization
+# yt-dlp options - Download to /tmp (no postprocessing)
 YDL_OPTIONS = {
-    'format': 'bestaudio[ext=m4a]/bestaudio[ext=webm]/bestaudio',
+    'format': 'bestaudio[ext=m4a]/bestaudio[ext=webm]/bestaudio/best',
     'outtmpl': '/tmp/%(id)s.%(ext)s',
     'noplaylist': True,
     'nocheckcertificate': True,
@@ -16,12 +16,6 @@ YDL_OPTIONS = {
     'default_search': 'ytsearch',
     'extract_flat': False,
     'cookiefile': 'cookies.txt',
-    # Optimize for low CPU/RAM
-    'postprocessors': [{
-        'key': 'FFmpegExtractAudio',
-        'preferredcodec': 'm4a',
-        'preferredquality': '128',  # Lower quality = less CPU/RAM
-    }],
 }
 
 
@@ -50,7 +44,7 @@ async def extract_info(search):
 
 
 async def download_audio(data, video_id):
-    """Download audio file to /tmp (optimized)"""
+    """Download audio file to /tmp"""
     loop = asyncio.get_event_loop()
     
     try:
