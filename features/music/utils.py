@@ -4,8 +4,9 @@ import yt_dlp
 
 
 # yt-dlp options - Stream audio (no download)
+# CRITICAL: Force direct HTTP streams, exclude HLS to prevent segment errors
 YDL_OPTIONS = {
-    'format': 'bestaudio[ext=m4a]/bestaudio[ext=webm]/bestaudio/best',
+    'format': 'bestaudio[protocol^=http][protocol!*=m3u8]/bestaudio/best',
     'noplaylist': True,
     'nocheckcertificate': True,
     'ignoreerrors': False,
