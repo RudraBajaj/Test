@@ -2,10 +2,9 @@
 import discord
 from discord.ext import commands
 import asyncio
-import os
 
 from .controls import MusicButtons
-from .utils import extract_info, download_audio
+from .utils import extract_info, FFMPEG_OPTIONS
 
 
 class MusicPlayer(commands.Cog):
@@ -53,7 +52,7 @@ class MusicPlayer(commands.Cog):
         searching_msg = await ctx.send(f"🔎 **Searching** for `{search}`...")
 
         try:
-            # Extract video info
+            # Extract video info and stream URL
             data = await extract_info(search)
             
             if not data:
@@ -62,39 +61,21 @@ class MusicPlayer(commands.Cog):
                 return
 
             # Get song details
+            url = data.get('url')
             title = data.get('title', 'Unknown')
             thumbnail = data.get('thumbnail')
             duration = data.get('duration', 0)
-            video_id = data.get('id', 'unknown')
 
-            await searching_msg.edit(content=f"⬇️ **Downloading** {title}...")
-
-            # Download audio to /tmp (optimized for low CPU/RAM)
-            audio_file = await download_audio(data, video_id)
-            
-            if not audio_file or not os.path.exists(audio_file):
+            if not url:
                 await searching_msg.delete()
-                await ctx.send("❌ Failed to download audio.")
+                await ctx.send("❌ Could not extract audio URL.")
                 return
 
             await searching_msg.delete()
 
-            # Play from local file (100% reliable, no segments)
-            def after_playing(error):
-                if error:
-                    print(f'Player error: {error}')
-                # Delete file after playback
-                try:
-                    if os.path.exists(audio_file):
-                        os.remove(audio_file)
-                        print(f"Deleted: {audio_file}")
-                except Exception as e:
-                    print(f"Cleanup error: {e}")
-                
-                self.current = None
-
-            source = discord.FFmpegOpusAudio(audio_file)
-            ctx.voice_client.play(source, after=after_playing)
+            # Stream audio (low CPU, reliable)
+            source = discord.FFmpegOpusAudio(url, **FFMPEG_OPTIONS)
+            ctx.voice_client.play(source, after=lambda e: print(f'Player error: {e}') if e else None)
             
             self.current = title
 

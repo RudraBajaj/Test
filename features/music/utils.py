@@ -1,13 +1,11 @@
-"""Music player utilities - Optimized for Render free tier"""
+"""Music player utilities - Streaming approach (most reliable for Render)"""
 import asyncio
 import yt_dlp
-import os
 
 
-# yt-dlp options - Download to /tmp (no postprocessing)
+# yt-dlp options - Stream audio (no download)
 YDL_OPTIONS = {
     'format': 'bestaudio[ext=m4a]/bestaudio[ext=webm]/bestaudio/best',
-    'outtmpl': '/tmp/%(id)s.%(ext)s',
     'noplaylist': True,
     'nocheckcertificate': True,
     'ignoreerrors': False,
@@ -18,15 +16,21 @@ YDL_OPTIONS = {
     'cookiefile': 'cookies.txt',
 }
 
+# FFmpeg options - Force start from 0:00
+FFMPEG_OPTIONS = {
+    'before_options': '-ss 0 -reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5',
+    'options': '-vn -b:a 128k'
+}
+
 
 async def extract_info(search):
-    """Extract video info from YouTube"""
+    """Extract video info and stream URL from YouTube"""
     loop = asyncio.get_event_loop()
     
     try:
         await asyncio.sleep(1)  # Rate limiting
         
-        ydl = yt_dlp.YoutubeDL({'quiet': True, 'no_warnings': True, 'cookiefile': 'cookies.txt'})
+        ydl = yt_dlp.YoutubeDL(YDL_OPTIONS)
         
         if search.startswith('http'):
             data = await loop.run_in_executor(None, lambda: ydl.extract_info(search, download=False))
@@ -40,34 +44,4 @@ async def extract_info(search):
         
     except Exception as e:
         print(f"Extraction error: {e}")
-        return None
-
-
-async def download_audio(data, video_id):
-    """Download audio file to /tmp"""
-    loop = asyncio.get_event_loop()
-    
-    try:
-        url = data.get('webpage_url') or data.get('url')
-        
-        ydl = yt_dlp.YoutubeDL(YDL_OPTIONS)
-        
-        # Download in background
-        await loop.run_in_executor(None, lambda: ydl.download([url]))
-        
-        # Find the downloaded file
-        possible_files = [
-            f'/tmp/{video_id}.m4a',
-            f'/tmp/{video_id}.webm',
-            f'/tmp/{video_id}.opus',
-        ]
-        
-        for file_path in possible_files:
-            if os.path.exists(file_path):
-                return file_path
-        
-        return None
-        
-    except Exception as e:
-        print(f"Download error: {e}")
         return None
