@@ -21,16 +21,6 @@ if TOKEN is None:
     print("Please make sure you created the .env file and put your token in it.")
     exit()
 
-# Create cookies.txt from environment variable (for Render deployment)
-COOKIES_CONTENT = os.getenv('YOUTUBE_COOKIES')
-if COOKIES_CONTENT:
-    print("Found YOUTUBE_COOKIES env var, creating cookies.txt...")
-    with open('cookies.txt', 'w') as f:
-        f.write(COOKIES_CONTENT)
-    print("Successfully created cookies.txt")
-else:
-    print("Warning: YOUTUBE_COOKIES not found. Music might fail.")
-
 # Set up the "intents" for the bot.
 intents = discord.Intents.default()
 intents.members = True 
@@ -99,12 +89,7 @@ async def on_ready():
     except Exception as e:
         print(f"Failed to load extension features.system.welcome: {e}")
 
-    # Load the music player (Music)
-    try:
-        await bot.load_extension('features.music.player')
-        print("Loaded extension: features.music.player")
-    except Exception as e:
-        print(f"Failed to load extension features.music.player: {e}")
+
 
 # Run the bot with the token
 if __name__ == '__main__':

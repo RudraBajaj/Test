@@ -46,14 +46,7 @@ class HelpView(discord.ui.View):
             discord.Color.light_grey()
         )
     
-    @discord.ui.button(label="🎵 Music", style=discord.ButtonStyle.blurple)
-    async def music_button(self, interaction: discord.Interaction, button: discord.ui.Button):
-        await self.update_embed(
-            interaction,
-            "🎵 Music Commands",
-            "`?join` - Join your voice channel\n`?play <song>` - Play a song from YouTube\n`?pause` - Pause playback\n`?resume` - Resume playback\n`?stop` - Stop and disconnect",
-            discord.Color.blue()
-        )
+
 
 class Help(commands.Cog):
     def __init__(self, bot):
