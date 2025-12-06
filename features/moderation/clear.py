@@ -14,6 +14,7 @@ class Clear(commands.Cog):
         Usage: !clear <amount>
         """
         if amount < 1:
+            
             await ctx.send("Please specify a number greater than 0.")
             return
 
