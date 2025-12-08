@@ -12,23 +12,18 @@ class Greetings(commands.Cog):
         if message.author == self.bot.user:
             return
 
-        # Check if the message content is exactly "Hii"
-        if message.content == "Hii":
-            # Reply to the message
+        content = message.content.lower()
+
+        # Check if the message contains "hii"
+        if "hii" in content:
             await message.channel.send("Hello! How are you?")
-        if message.content == "Luna":
-            # Reply to the message
-            await message.channel.send("Queen of the server!")
-        if message.content == "Ayush":
-            # Reply to the message
-            await message.channel.send("Mera lawda haha")
-        if message.content == "StarDust":
-            # Reply to the message
-            await message.channel.send("Star of the server!")
+        
+        if "ayush" in content:
+            await message.channel.send("```Mera lawda haha```")
 
         # Check if the bot is mentioned (tagged) in the message
         if self.bot.user in message.mentions:
-            await message.channel.send("You tagged me! How can I help?")
+            await message.channel.send("```You tagged me! How can I help?```")
 
 # This function is needed to load the Cog
 async def setup(bot):
